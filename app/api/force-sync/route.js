@@ -8,11 +8,11 @@ export async function GET() {
     const debugInfo = {
         hasEmail: !!process.env.GOOGLE_SERVICE_ACCOUNT_EMAIL,
         hasKey: !!rawKey,
-        keyLength: rawKey.length,
-        keyStartsWithHeader: rawKey.includes('-----BEGIN PRIVATE KEY-----'),
-        keyEndsWithFooter: rawKey.includes('-----END PRIVATE KEY-----'),
-        keyHasEscapedNewlines: rawKey.includes('\\n'),
-        keyHasRealNewlines: rawKey.includes('\n'),
+        rawLength: rawKey.length,
+        hasHeader: rawKey.includes('-----BEGIN PRIVATE KEY-----'),
+        hasFooter: rawKey.includes('-----END PRIVATE KEY-----'),
+        hasEscapedNewlines: rawKey.includes('\\n'),
+        hasRealNewlines: rawKey.includes('\n'),
         email: process.env.GOOGLE_SERVICE_ACCOUNT_EMAIL ? (process.env.GOOGLE_SERVICE_ACCOUNT_EMAIL.substring(0, 10) + '...') : 'missing'
     }
 
