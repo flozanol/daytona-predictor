@@ -6,32 +6,12 @@ import { calcularPronosticoDaytona } from '@/lib/forecast'
 export const dynamic = 'force-dynamic'
 
 async function getSalesData() {
-    // Fetch labels for debugging funnels
-    let labels = [];
-    try {
-        const { getSheetLabels } = await import('@/lib/import-logic');
-        labels = await getSheetLabels('MG Cuajimalpa');
-    } catch (e) {
-        console.error('Error fetching labels:', e);
-    }
-
-    const { data: marchData } = await supabase
-        .from('registros_agencias')
-        .select('*')
-        .gte('fecha', '2026-03-01')
-        .lte('fecha', '2026-03-31')
-
-    const { data: februaryData } = await supabase
-        .from('registros_agencias')
-        .select('*')
-        .gte('fecha', '2026-02-01')
-        .lte('fecha', '2026-02-28')
-
-    return { marchData, februaryData, labels }
+    // Fetch labels removed - Mapping complete
+    return { marchData, februaryData }
 }
 
 export default async function Dashboard() {
-    const { marchData, februaryData, labels } = await getSalesData()
+    const { marchData, februaryData } = await getSalesData()
 
     const agencias = [
         'Acura', 'GWM Cuernavaca', 'GWM Iztapalapa',
@@ -49,6 +29,17 @@ export default async function Dashboard() {
         const ventasNuevosHoy = marchAgencia.reduce((acc, r) => acc + (r.ventas_nuevos || 0), 0)
         const ventasSemisHoy = marchAgencia.reduce((acc, r) => acc + (r.ventas_seminuevos || 0), 0)
 
+        // Métricas de Funnel
+        const leads = marchAgencia.reduce((acc, r) => acc + (r.leads || 0), 0)
+        const contactados = marchAgencia.reduce((acc, r) => acc + (r.leads_contactados || 0), 0)
+        const citasAgendadas = marchAgencia.reduce((acc, r) => acc + (r.citas_agendadas || 0), 0)
+        const citasEfectivas = marchAgencia.reduce((acc, r) => acc + (r.citas_efectivas || 0), 0)
+
+        const visitas = marchAgencia.reduce((acc, r) => acc + (r.visitas_piso || 0), 0)
+        const pruebas = marchAgencia.reduce((acc, r) => acc + (r.pruebas_manejo || 0), 0)
+        const financiera = marchAgencia.reduce((acc, r) => acc + (r.solicitudes_financiera || 0), 0)
+        const avaluos = marchAgencia.reduce((acc, r) => acc + (r.avaluos || 0), 0)
+
         const pronosticoNuevos = calcularPronosticoDaytona(ventasNuevosHoy, diaCorte, agencia)
         const pronosticoSemis = calcularPronosticoDaytona(ventasSemisHoy, diaCorte, agencia)
 
@@ -61,13 +52,35 @@ export default async function Dashboard() {
             pronosticoNuevos,
             pronosticoSemis,
             pronosticoTotal: pronosticoNuevos + pronosticoSemis,
-            tendenciaPositiva: (pronosticoNuevos + pronosticoSemis) > cierreFebTotal
+            tendenciaPositiva: (pronosticoNuevos + pronosticoSemis) > cierreFebTotal,
+            funnel: {
+                digital: { leads, contactados, citasAgendadas, citasEfectivas, ventas: ventasNuevosHoy },
+                showroom: { visitas, pruebas, financiera, avaluos, ventas: ventasNuevosHoy }
+            }
         }
     })
 
     const globalVentasNuevos = stats.reduce((acc, s) => acc + s.ventasNuevosHoy, 0)
     const globalVentasSemis = stats.reduce((acc, s) => acc + s.ventasSemisHoy, 0)
     const globalPronostico = stats.reduce((acc, s) => acc + s.pronosticoTotal, 0)
+
+    // Totales de Funnel Global
+    const globalFunnel = {
+        digital: {
+            leads: stats.reduce((acc, s) => acc + s.funnel.digital.leads, 0),
+            contactados: stats.reduce((acc, s) => acc + s.funnel.digital.contactados, 0),
+            citas: stats.reduce((acc, s) => acc + s.funnel.digital.citasAgendadas, 0),
+            efectivas: stats.reduce((acc, s) => acc + s.funnel.digital.citasEfectivas, 0),
+            ventas: stats.reduce((acc, s) => acc + s.funnel.digital.ventas, 0)
+        },
+        showroom: {
+            visitas: stats.reduce((acc, s) => acc + s.funnel.showroom.visitas, 0),
+            pruebas: stats.reduce((acc, s) => acc + s.funnel.showroom.pruebas, 0),
+            financiera: stats.reduce((acc, s) => acc + s.funnel.showroom.financiera, 0),
+            avaluos: stats.reduce((acc, s) => acc + s.funnel.showroom.avaluos, 0),
+            ventas: stats.reduce((acc, s) => acc + s.funnel.showroom.ventas, 0)
+        }
+    }
 
     return (
         <main className="min-h-screen premium-bg text-slate-100 p-4 md:p-12 relative overflow-hidden">
@@ -166,68 +179,78 @@ export default async function Dashboard() {
                 </div>
             </section>
 
-            {/* Funnel Placeholder / Mockup */}
+            {/* Funnel Real Data */}
             <section className="relative z-10 grid grid-cols-1 md:grid-cols-2 gap-8 mt-16 pb-32">
-                <div className="glass-card p-10 border-cyan-500/10">
-                    <h3 className="text-2xl font-black mb-8 flex items-center gap-2">
-                        <span className="w-8 h-8 rounded-lg bg-cyan-500/20 flex items-center justify-center text-cyan-400 text-sm">🌐</span>
-                        Digital Funnel
-                    </h3>
-                    <div className="space-y-6 opacity-40">
-                        {['Leads', 'Contactados', 'Citas', 'Efectivas', 'Ventas'].map((step, i) => (
-                            <div key={step} className="relative">
-                                <div className="flex justify-between mb-2 px-1">
-                                    <span className="text-[10px] font-bold uppercase tracking-widest">{step}</span>
-                                    <span className="text-xs font-mono">--</span>
-                                </div>
-                                <div className="h-2 w-full bg-white/5 rounded-full overflow-hidden">
-                                    <div className="h-full bg-cyan-500/50" style={{ width: `${100 - i * 15}%` }} />
-                                </div>
-                            </div>
-                        ))}
-                        <p className="text-[10px] text-center italic text-slate-500 pt-4">Descubriendo filas en Google Sheets...</p>
-                    </div>
-                </div>
+                <FunnelWidget
+                    title="Digital Funnel"
+                    icon="🌐"
+                    color="cyan"
+                    data={[
+                        { label: 'Leads', value: globalFunnel.digital.leads },
+                        { label: 'Contactados', value: globalFunnel.digital.contactados },
+                        { label: 'Citas', value: globalFunnel.digital.citas },
+                        { label: 'Efectivas', value: globalFunnel.digital.efectivas },
+                        { label: 'Ventas', value: globalFunnel.digital.ventas }
+                    ]}
+                />
 
-                <div className="glass-card p-10 border-amber-500/10">
-                    <h3 className="text-2xl font-black mb-8 flex items-center gap-2">
-                        <span className="w-8 h-8 rounded-lg bg-amber-500/20 flex items-center justify-center text-amber-400 text-sm">🚗</span>
-                        Showroom Funnel
-                    </h3>
-                    <div className="space-y-6 opacity-40">
-                        {['Visitas', 'Pruebas', 'Financiera', 'Avalúos', 'Ventas'].map((step, i) => (
-                            <div key={step} className="relative">
-                                <div className="flex justify-between mb-2 px-1">
-                                    <span className="text-[10px] font-bold uppercase tracking-widest">{step}</span>
-                                    <span className="text-xs font-mono">--</span>
-                                </div>
-                                <div className="h-2 w-full bg-white/5 rounded-full overflow-hidden">
-                                    <div className="h-full bg-amber-500/50" style={{ width: `${100 - i * 15}%` }} />
-                                </div>
-                            </div>
-                        ))}
-                        <p className="text-[10px] text-center italic text-slate-500 pt-4">Esperando mapeo de datos...</p>
-                    </div>
-                </div>
+                <FunnelWidget
+                    title="Showroom Funnel"
+                    icon="🚗"
+                    color="amber"
+                    data={[
+                        { label: 'Visitas', value: globalFunnel.showroom.visitas },
+                        { label: 'Pruebas', value: globalFunnel.showroom.pruebas },
+                        { label: 'Financiera', value: globalFunnel.showroom.financiera },
+                        { label: 'Avalúos', value: globalFunnel.showroom.avaluos },
+                        { label: 'Ventas', value: globalFunnel.showroom.ventas }
+                    ]}
+                />
             </section>
 
-            {/* Metadata Explorer (Temporary for V2 mapping) */}
-            <div className="fixed bottom-0 left-0 right-0 z-50 p-4 transform translate-y-[85%] hover:translate-y-0 transition-transform duration-500">
-                <div className="max-w-4xl mx-auto glass-card border-none rounded-t-[2rem] bg-cyan-950/80 backdrop-blur-3xl shadow-[0_-20px_50px_rgba(0,0,0,0.5)] p-8">
-                    <div className="flex justify-between items-center mb-6">
-                        <h4 className="text-xs font-black tracking-[0.3em] uppercase text-cyan-400">Metadata Explorer (Mapas de Google Sheet)</h4>
-                        <span className="text-[8px] px-2 py-1 bg-white/10 rounded">Buscando Funnel en "MG Cuajimalpa"</span>
-                    </div>
-                    <div className="h-64 overflow-y-auto grid grid-cols-2 md:grid-cols-4 gap-2 text-[10px] font-mono scrollbar-hide">
-                        {labels?.map(l => (
-                            <div key={l.row} className="p-2 bg-black/20 rounded border border-white/5 hover:border-cyan-500/30 transition-colors">
-                                <span className="text-cyan-500 mr-2">{l.row}:</span>
-                                <span className="text-slate-300">{l.label}</span>
-                            </div>
-                        ))}
-                    </div>
-                </div>
-            </div>
         </main>
     )
+}
+
+function FunnelWidget({ title, icon, color, data }) {
+    const colorClass = color === 'cyan' ? 'bg-cyan-500' : 'bg-amber-500';
+    const textClass = color === 'cyan' ? 'text-cyan-400' : 'text-amber-400';
+    const borderClass = color === 'cyan' ? 'border-cyan-500/10' : 'border-amber-500/10';
+
+    return (
+        <div className={`glass-card p-10 border ${borderClass}`}>
+            <h3 className="text-2xl font-black mb-8 flex items-center gap-2">
+                <span className={`w-8 h-8 rounded-lg ${colorClass}/20 flex items-center justify-center ${textClass} text-sm`}>{icon}</span>
+                {title}
+            </h3>
+            <div className="space-y-6">
+                {data.map((step, i) => {
+                    const prevValue = data[i - 1]?.value || step.value;
+                    const conversion = i === 0 ? 100 : (prevValue > 0 ? (step.value / prevValue) * 100 : 0);
+
+                    return (
+                        <div key={step.label} className="relative">
+                            <div className="flex justify-between mb-2 px-1 items-end">
+                                <div className="flex flex-col">
+                                    <span className="text-[10px] font-black uppercase tracking-widest text-slate-500">{step.label}</span>
+                                    <span className="text-2xl font-black">{step.value.toLocaleString()}</span>
+                                </div>
+                                {i > 0 && (
+                                    <span className={`text-[10px] font-bold px-2 py-0.5 rounded ${colorClass}/10 ${textClass}`}>
+                                        {conversion.toFixed(1)}% conv.
+                                    </span>
+                                )}
+                            </div>
+                            <div className="h-2 w-full bg-white/5 rounded-full overflow-hidden">
+                                <div
+                                    className={`h-full ${colorClass} transition-all duration-1000 shadow-[0_0_15px_rgba(34,211,238,0.5)]`}
+                                    style={{ width: `${Math.max(5, (step.value / data[0].value) * 100 || 0)}%` }}
+                                />
+                            </div>
+                        </div>
+                    );
+                })}
+            </div>
+        </div>
+    );
 }
