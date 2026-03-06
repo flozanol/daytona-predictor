@@ -1,5 +1,5 @@
 import { supabase } from '@/lib/supabase'
-import { calcularPronosticoDaytona } from '@/lib/forecast'
+import { calcularPronosticoDaytona, calcularPronostico20 } from '@/lib/forecast'
 
 export const dynamic = 'force-dynamic'
 
@@ -57,6 +57,7 @@ export default async function Dashboard() {
 
         const pronosticoNuevos = calcularPronosticoDaytona(ventasNuevosHoy, diaCorte, agencia)
         const pronosticoSemis = calcularPronosticoDaytona(ventasSemisHoy, diaCorte, agencia)
+        const pronosticoCierre20 = calcularPronostico20(ventasNuevosHoy, apartados, probables)
 
         const cierreFebTotal = febAgencia.reduce((acc, r) => acc + (r.ventas_nuevos || 0) + (r.ventas_seminuevos || 0), 0)
 
@@ -66,10 +67,12 @@ export default async function Dashboard() {
             ventasSemisHoy,
             pronosticoNuevos,
             pronosticoSemis,
-            pronosticoTotal: pronosticoNuevos + pronosticoSemis,
-            tendenciaPositiva: (pronosticoNuevos + pronosticoSemis) > cierreFebTotal,
+            pronostico20: pronosticoCierre20,
+            pronosticoTotal: pronosticoCierre20 + pronosticoSemis, // Usamos el 2.0 para el total
+            tendenciaPositiva: (pronosticoCierre20 + pronosticoSemis) > cierreFebTotal,
             probables,
             apartados,
+            leads,
             funnel: {
                 digital: { leads, contactados, citasAgendadas, citasEfectivas, ventas: ventasNuevosHoy },
                 showroom: { visitas, pruebas, financiera, aprobados, avaluos, ventas: ventasNuevosHoy }

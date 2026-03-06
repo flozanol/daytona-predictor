@@ -119,7 +119,14 @@ export default function DashboardClient({ initialStats, agencias, diaCorte }) {
                                     <td className="px-8 py-6">
                                         <div className="flex items-center gap-3">
                                             <div className={`w-2 h-2 rounded-full ${s.tendenciaPositiva ? 'bg-cyan-500 shadow-[0_0_10px_rgba(34,211,238,0.5)]' : 'bg-amber-500 animate-pulse'}`} />
-                                            <span className="text-lg font-bold tracking-tight">{s.agencia}</span>
+                                            <div>
+                                                <span className="text-lg font-bold tracking-tight">{s.agencia}</span>
+                                                <div className="flex gap-2 text-[9px] font-mono text-slate-500 mt-1 uppercase tracking-tighter">
+                                                    <span>L: <b className="text-cyan-400/80">{s.leads || 0}</b></span>
+                                                    <span>A: <b className="text-white">{s.apartados || 0}</b></span>
+                                                    <span>P: <b className="text-amber-400/80">{s.probables || 0}</b></span>
+                                                </div>
+                                            </div>
                                         </div>
                                     </td>
                                     <td className="px-8 py-6">
