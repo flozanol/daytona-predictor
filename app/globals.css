@@ -3,24 +3,52 @@
 @tailwind utilities;
 
 :root {
-  --background: #050b18;
-  --foreground: #ffffff;
+  --background: #020617;
+  --foreground: #f8fafc;
+  --accent-cyan: #22d3ee;
+  --accent-amber: #fbbf24;
 }
 
 body {
   color: var(--foreground);
   background: var(--background);
-  font-family: Arial, Helvetica, sans-serif;
+  font-family: 'Inter', sans-serif;
+  overflow-x: hidden;
 }
 
-.premium-gradient {
-  background: linear-gradient(135deg, #0A192F 0%, #050b18 100%);
+.glass-card {
+  @apply bg-white/[0.03] border border-white/10 backdrop-blur-xl rounded-[2rem] shadow-2xl;
 }
 
-.gold-text {
-  color: #D4AF37;
+.neon-text-cyan {
+  text-shadow: 0 0 20px rgba(34, 211, 238, 0.4);
+}
+
+.neon-text-gold {
+  color: var(--accent-amber);
+  text-shadow: 0 0 20px rgba(251, 191, 36, 0.3);
 }
 
 .gold-border {
-  border-color: #D4AF37;
+  border-color: rgba(251, 191, 36, 0.2);
+}
+
+.premium-bg {
+  background: radial-gradient(circle at 50% 0%, #1e293b 0%, #020617 100%);
+}
+
+.glow-cyan {
+  box-shadow: 0 0 40px -10px rgba(34, 211, 238, 0.3);
+}
+
+.animated-bg {
+  position: fixed;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 100%;
+  background: radial-gradient(circle at 10% 20%, rgba(34, 211, 238, 0.05) 0%, transparent 40%),
+    radial-gradient(circle at 90% 80%, rgba(251, 191, 36, 0.05) 0%, transparent 40%);
+  pointer-events: none;
+  z-index: -1;
 }
