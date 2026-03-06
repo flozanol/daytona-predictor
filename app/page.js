@@ -43,8 +43,8 @@ export default async function Dashboard() {
         const cierreFebTotal = febAgencia.reduce((acc, r) => acc + (r.ventas_nuevos || 0) + (r.ventas_seminuevos || 0), 0)
 
         // Aplicamos la lógica oficial de pronóstico por separado o conjunta
-        const pronosticoNuevos = calcularPronosticoDaytona(ventasNuevosHoy, diaCorte)
-        const pronosticoSemis = calcularPronosticoDaytona(ventasSeminuevosHoy, diaCorte)
+        const pronosticoNuevos = calcularPronosticoDaytona(ventasNuevosHoy, diaCorte, agencia)
+        const pronosticoSemis = calcularPronosticoDaytona(ventasSeminuevosHoy, diaCorte, agencia)
         const pronosticoTotal = pronosticoNuevos + pronosticoSemis
 
         const sube = pronosticoTotal > cierreFebTotal
