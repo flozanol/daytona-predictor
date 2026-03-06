@@ -56,98 +56,96 @@ export default function DashboardClient({ initialStats, agencias, diaCorte }) {
         <main className="min-h-screen premium-bg text-slate-100 p-4 md:p-12 relative overflow-hidden">
             <div className="animated-bg" />
 
-            <header className="relative z-10 mb-16 flex flex-col md:flex-row justify-between items-start md:items-center gap-8">
-                <div>
-                    <h1 className="text-6xl md:text-8xl font-black tracking-tighter neon-text-cyan mb-4">
-                        DAYTONA<span className="text-white/20">.</span>CORE
-                    </h1>
-                    <div className="flex items-center gap-4">
-                        <span className="px-3 py-1 bg-cyan-500/10 border border-cyan-500/20 rounded-full text-[10px] font-bold tracking-widest text-cyan-400 uppercase">
-                            Intelligence v2.0
-                        </span>
-                        <span className="text-slate-500 text-xs font-medium uppercase tracking-widest">
-                            MARZO 2026 • DÍA {diaCorte}
-                        </span>
+            {/* BARRA CORPORATIVA SUPERIOR */}
+            <div className="relative z-20 mb-12 flex flex-col md:flex-row justify-between items-center bg-white/[0.03] border border-white/10 p-6 rounded-[2rem] backdrop-blur-3xl shadow-2xl">
+                <div className="flex flex-col mb-4 md:mb-0">
+                    <h2 className="text-sm font-black tracking-[0.3em] uppercase opacity-40">Grupo Daytona • Predictor IA</h2>
+                    <p className="text-2xl font-black text-white">CONSOLIDADO MARZO 6</p>
+                </div>
+                <div className="flex gap-12 text-center">
+                    <div>
+                        <p className="text-[10px] uppercase tracking-widest opacity-50 font-bold mb-1">Cierre Proyectado</p>
+                        <p className="text-3xl font-black neon-text-cyan">{globalPronostico}</p>
+                    </div>
+                    <div className="hidden md:block">
+                        <p className="text-[10px] uppercase tracking-widest opacity-50 font-bold mb-1">Reales (N+S)</p>
+                        <p className="text-3xl font-black text-white">{globalVentasNuevos + globalVentasSemis}</p>
+                    </div>
+                    <div className="hidden md:block">
+                        <p className="text-[10px] uppercase tracking-widest opacity-50 font-bold mb-1">Apartados</p>
+                        <p className="text-3xl font-black text-emerald-400">{globalFunnel.predictors.apartados}</p>
                     </div>
                 </div>
-
                 <DashboardFilters
                     agencias={agencias}
                     currentFilter={filter}
                     onFilterChange={setFilter}
                 />
+            </div>
+
+            <header className="relative z-10 mb-16 flex flex-col md:flex-row justify-between items-start md:items-center gap-8">
+                <div>
+                    <h1 className="text-6xl md:text-8xl font-black tracking-tighter neon-text-cyan mb-4">
+                        DAYTONA<span className="text-white/20">.</span>CORE
+                    </h1>
+                    <span className="px-3 py-1 bg-cyan-500/10 border border-cyan-500/20 rounded-full text-[10px] font-bold tracking-widest text-cyan-400 uppercase">
+                        Intelligence v2.2 Luxury
+                    </span>
+                </div>
             </header>
 
-            <section className="relative z-10 grid grid-cols-1 md:grid-cols-4 gap-6 mb-16">
-                <KpiTile label="Unidades Nuevas" value={globalVentasNuevos} subtext="Ventas Reales" color="cyan" glow />
-                <KpiTile label="Unidades Seminuevos" value={globalVentasSemis} subtext="En crecimiento" color="amber" />
-                <KpiTile label="Pronóstico AI (Total)" value={globalPronostico} subtext="Proyección Fin de Mes" color="cyan" neon />
-                <div className="glass-card p-8 bg-gradient-to-br from-cyan-500/10 to-transparent border-cyan-500/20">
-                    <p className="text-slate-400 text-[10px] font-black tracking-[0.2em] uppercase mb-4">Potencial de Cierre</p>
-                    <div className="flex justify-between items-end">
+            {/* GRID DE AGENCIAS (LUJO) */}
+            <section className="relative z-10 grid grid-cols-1 md:grid-cols-3 gap-8 mb-20">
+                {filteredStats.map(s => (
+                    <div key={s.agencia} className="glass-card p-10 flex flex-col justify-between card-hover-effect border-t-2 border-t-cyan-500/20">
                         <div>
-                            <h2 className="text-4xl font-black mb-1">{globalFunnel.predictors.probables || 0}</h2>
-                            <p className="text-cyan-400/60 text-[10px] font-medium uppercase">Probables 48h</p>
+                            <div className="flex justify-between items-start mb-10">
+                                <div>
+                                    <h3 className="text-2xl font-black tracking-tighter mb-1 uppercase italic">{s.agencia}</h3>
+                                    <div className="flex gap-2 text-[10px] font-mono text-slate-500 uppercase tracking-widest">
+                                        <span>REALE: <b className="text-white">{s.ventasNuevosHoy + s.ventasSemisHoy}</b></span>
+                                    </div>
+                                </div>
+                                <div className={`w-3 h-3 rounded-full ${s.tendenciaPositiva ? 'bg-cyan-500 shadow-[0_0_15px_rgba(34,211,238,0.7)]' : 'bg-amber-500 animate-pulse shadow-[0_0_10px_rgba(251,191,36,0.5)]'}`} />
+                            </div>
+
+                            {/* INDICADORES DE SALUD (FUNNEL) */}
+                            <div className="bg-white/[0.02] border border-white/5 rounded-2xl p-4 mb-8 flex justify-around items-center">
+                                <div className="text-center">
+                                    <p className="text-[9px] text-slate-500 uppercase font-black mb-1">🌐 Leads</p>
+                                    <p className="text-lg font-black text-cyan-400">{s.leads || 0}</p>
+                                </div>
+                                <div className="w-px h-8 bg-white/10" />
+                                <div className="text-center">
+                                    <p className="text-[9px] text-slate-500 uppercase font-black mb-1">📅 Citas</p>
+                                    <p className="text-lg font-black text-white">{s.funnel.digital.citasEfectivas || 0}</p>
+                                </div>
+                                <div className="w-px h-8 bg-white/10" />
+                                <div className="text-center">
+                                    <p className="text-[9px] text-slate-500 uppercase font-black mb-1">💎 Apart.</p>
+                                    <p className="text-lg font-black text-emerald-400">{s.apartados || 0}</p>
+                                </div>
+                            </div>
                         </div>
-                        <div className="text-right">
-                            <h2 className="text-4xl font-black mb-1 text-white">{globalFunnel.predictors.apartados || 0}</h2>
-                            <p className="text-slate-500 text-[10px] font-medium uppercase">Apartados</p>
+
+                        <div>
+                            {/* TERMÓMETRO DE CIERRE */}
+                            <div className="flex flex-col items-end">
+                                <p className="text-[10px] font-black tracking-[0.2em] text-slate-500 uppercase mb-2">Termómetro de Cierre</p>
+                                <span className="thermometer-text">
+                                    {s.pronostico20}
+                                </span>
+                                <p className="text-[10px] font-bold text-cyan-400/50 uppercase">Unidades Proyectadas</p>
+                            </div>
+
+                            <div className="mt-8 pt-6 border-t border-white/5 flex justify-between items-center opacity-40 group-hover:opacity-100 transition-opacity">
+                                <span className="text-[9px] font-mono">P: {s.probables}</span>
+                                <span className="text-[9px] font-mono">S: {s.pronosticoSemis}</span>
+                                <span className="text-[9px] font-mono">IA: V2.2</span>
+                            </div>
                         </div>
                     </div>
-                </div>
-            </section>
-
-            <section className="relative z-10 glass-card overflow-hidden mb-16">
-                <div className="p-8 border-b border-white/5 flex justify-between items-center bg-white/[0.01]">
-                    <h3 className="text-xl font-bold tracking-tight">Ranking de Operación</h3>
-                    <span className="text-[10px] text-slate-500 uppercase tracking-widest font-bold">{filteredStats.length} Agencias Listadas</span>
-                </div>
-                <div className="overflow-x-auto">
-                    <table className="w-full">
-                        <thead>
-                            <tr className="text-left bg-white/[0.01]">
-                                <th className="px-8 py-6 text-[10px] font-black uppercase tracking-widest text-slate-500">Agencia</th>
-                                <th className="px-8 py-6 text-[10px] font-black uppercase tracking-widest text-slate-500">Ventas (N/S)</th>
-                                <th className="px-8 py-6 text-[10px] font-black uppercase tracking-widest text-slate-500">Forecast Nuevos</th>
-                                <th className="px-8 py-6 text-[10px] font-black uppercase tracking-widest text-slate-500">Forecast Semis</th>
-                                <th className="px-8 py-6 text-[10px] font-black uppercase tracking-widest text-slate-500">Total IA</th>
-                            </tr>
-                        </thead>
-                        <tbody className="divide-y divide-white/5">
-                            {filteredStats.map(s => (
-                                <tr key={s.agencia} className="group hover:bg-white/[0.02] transition-colors">
-                                    <td className="px-8 py-6">
-                                        <div className="flex items-center gap-3">
-                                            <div className={`w-2 h-2 rounded-full ${s.tendenciaPositiva ? 'bg-cyan-500 shadow-[0_0_10px_rgba(34,211,238,0.5)]' : 'bg-amber-500 animate-pulse'}`} />
-                                            <div>
-                                                <span className="text-lg font-bold tracking-tight">{s.agencia}</span>
-                                                <div className="flex gap-2 text-[9px] font-mono text-slate-500 mt-1 uppercase tracking-tighter">
-                                                    <span>L: <b className="text-cyan-400/80">{s.leads || 0}</b></span>
-                                                    <span>A: <b className="text-white">{s.apartados || 0}</b></span>
-                                                    <span>P: <b className="text-amber-400/80">{s.probables || 0}</b></span>
-                                                </div>
-                                            </div>
-                                        </div>
-                                    </td>
-                                    <td className="px-8 py-6">
-                                        <div className="flex gap-2 font-mono text-sm">
-                                            <span className="text-white">{s.ventasNuevosHoy}</span>
-                                            <span className="text-slate-600">/</span>
-                                            <span className="text-slate-400">{s.ventasSemisHoy}</span>
-                                        </div>
-                                    </td>
-                                    <td className="px-8 py-6 text-cyan-400 font-black">{s.pronosticoNuevos}</td>
-                                    <td className="px-8 py-6 text-amber-400/80 font-bold">{s.pronosticoSemis}</td>
-                                    <td className="px-8 py-6">
-                                        <span className="text-2xl font-black bg-gradient-to-r from-white to-slate-500 bg-clip-text text-transparent">
-                                            {s.pronosticoTotal}
-                                        </span>
-                                    </td>
-                                </tr>
-                            ))}
-                        </tbody>
-                    </table>
-                </div>
+                ))}
             </section>
 
             <section className="relative z-10 grid grid-cols-1 md:grid-cols-2 gap-8 pb-32">
