@@ -60,15 +60,19 @@ export default async function Dashboard() {
         const pronosticoCierre20 = calcularPronostico20(ventasNuevosHoy, apartados, probables)
 
         const cierreFebTotal = febAgencia.reduce((acc, r) => acc + (r.ventas_nuevos || 0) + (r.ventas_seminuevos || 0), 0)
+        const febNuevos = febAgencia.reduce((acc, r) => acc + (r.ventas_nuevos || 0), 0)
+        const febSemis = febAgencia.reduce((acc, r) => acc + (r.ventas_seminuevos || 0), 0)
 
         return {
             agencia,
             ventasNuevosHoy,
             ventasSemisHoy,
+            febNuevos,
+            febSemis,
             pronosticoNuevos,
             pronosticoSemis,
             pronostico20: pronosticoCierre20,
-            pronosticoTotal: pronosticoCierre20 + pronosticoSemis, // Usamos el 2.0 para el total
+            pronosticoTotal: pronosticoCierre20 + pronosticoSemis,
             tendenciaPositiva: (pronosticoCierre20 + pronosticoSemis) > cierreFebTotal,
             probables,
             apartados,
@@ -82,6 +86,8 @@ export default async function Dashboard() {
 
     const globalVentasNuevos = stats.reduce((acc, s) => acc + s.ventasNuevosHoy, 0)
     const globalVentasSemis = stats.reduce((acc, s) => acc + s.ventasSemisHoy, 0)
+    const globalFebNuevos = stats.reduce((acc, s) => acc + s.febNuevos, 0)
+    const globalFebSemis = stats.reduce((acc, s) => acc + s.febSemis, 0)
     const globalPronostico = stats.reduce((acc, s) => acc + s.pronosticoTotal, 0)
 
     // Totales de Funnel Global
@@ -97,6 +103,7 @@ export default async function Dashboard() {
             visitas: stats.reduce((acc, s) => acc + s.funnel.showroom.visitas, 0),
             pruebas: stats.reduce((acc, s) => acc + s.funnel.showroom.pruebas, 0),
             financiera: stats.reduce((acc, s) => acc + s.funnel.showroom.financiera, 0),
+            aprobados: stats.reduce((acc, s) => acc + s.funnel.showroom.aprobados, 0), // Added aprobados here too
             avaluos: stats.reduce((acc, s) => acc + s.funnel.showroom.avaluos, 0),
             ventas: stats.reduce((acc, s) => acc + s.funnel.showroom.ventas, 0)
         }
@@ -107,6 +114,7 @@ export default async function Dashboard() {
             initialStats={stats}
             agencias={agencias}
             diaCorte={diaCorte}
+            globalFebBaselines={{ nuevos: globalFebNuevos, semis: globalFebSemis }}
         />
     )
 }

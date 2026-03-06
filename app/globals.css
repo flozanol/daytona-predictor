@@ -3,8 +3,10 @@
 @tailwind utilities;
 
 :root {
-  --background: #020617;
-  /* Slate-950 */
+  --background: #0f172a;
+  /* Dark Slate */
+  --daytona-red: #e11d48;
+  /* Red Daytona */
   --foreground: #f8fafc;
   --accent-cyan: #22d3ee;
   --accent-emerald: #10b981;
@@ -19,19 +21,18 @@ body {
   overflow-x: hidden;
 }
 
-/* Glassmorphism Ejecutivo */
-.executive-glass {
-  @apply bg-slate-900/40 border border-white/5 backdrop-blur-3xl shadow-[0_8px_32px_0_rgba(0, 0, 0, 0.8)];
+/* Bento Layout & Cards */
+.bento-card {
+  @apply bg-slate-900/40 border border-white/5 backdrop-blur-xl rounded-[1.5rem] p-6 transition-all duration-300 hover:bg-slate-900/60 hover:border-rose-500/20;
 }
 
-.executive-glass-card {
-  @apply executive-glass rounded-[2.5rem] p-8 transition-all duration-500 hover:bg-slate-900/60;
+.daytona-red-glow {
+  filter: drop-shadow(0 0 15px rgba(225, 29, 72, 0.4));
 }
 
 /* Reloj de Cierre (Forecast) */
 .closing-clock {
   @apply text-6xl font-black tracking-tighter text-white;
-  filter: drop-shadow(0 0 20px rgba(34, 211, 238, 0.4));
 }
 
 .neon-glow-cyan {
