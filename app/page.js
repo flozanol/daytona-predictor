@@ -1,6 +1,4 @@
 import { supabase } from '@/lib/supabase'
-import AgencyTableRow from '@/components/AgencyTableRow'
-import KpiCard from '@/components/KpiCard'
 import { calcularPronosticoDaytona } from '@/lib/forecast'
 
 export const dynamic = 'force-dynamic'
@@ -255,7 +253,7 @@ function FunnelWidget({ title, icon, color, data }) {
                             <div className="h-2 w-full bg-white/5 rounded-full overflow-hidden">
                                 <div
                                     className={`h-full ${colorClass} transition-all duration-1000 shadow-[0_0_15px_rgba(34,211,238,0.5)]`}
-                                    style={{ width: `${Math.max(5, (step.value / data[0].value) * 100 || 0)}%` }}
+                                    style={{ width: `${data[0].value > 0 ? Math.max(5, (step.value / data[0].value) * 100) : 5}%` }}
                                 />
                             </div>
                         </div>
