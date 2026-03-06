@@ -23,7 +23,10 @@ export async function GET() {
             success: true,
             message: 'Sincronización completada',
             results,
-            debug: debugInfo
+            debug: {
+                ...debugInfo,
+                cleanedMetrics: results.debug // Pasamos las métricas internas si las hay
+            }
         })
     } catch (error) {
         console.error('Manual Sync Error:', error)
@@ -32,7 +35,7 @@ export async function GET() {
             error: error.message,
             stack: error.stack,
             debug: debugInfo,
-            hint: 'EPERM o DECODER suelen ser error de formato en la GOOGLE_PRIVATE_KEY. Asegúrate de que pegaste la llave completa, sin comillas, y que las cabeceras BEGIN/END están presentes.'
+            hint: 'Si el error persiste, intenta pegar el CONTENIDO COMPLETO del JSON de Google Service Account en la variable GOOGLE_PRIVATE_KEY (incluyendo las llaves {}). Mi nuevo código ahora detecta y procesa ambos formatos.'
         }, { status: 500 })
     }
 }
