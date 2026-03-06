@@ -4,21 +4,20 @@ import { NextResponse } from 'next/server'
 export const dynamic = 'force-dynamic'
 
 export async function GET() {
+    const rawKey = process.env.GOOGLE_PRIVATE_KEY || '';
+    const debugInfo = {
+        hasEmail: !!process.env.GOOGLE_SERVICE_ACCOUNT_EMAIL,
+        hasKey: !!rawKey,
+        keyLength: rawKey.length,
+        keyStartsWithHeader: rawKey.includes('-----BEGIN PRIVATE KEY-----'),
+        keyEndsWithFooter: rawKey.includes('-----END PRIVATE KEY-----'),
+        keyHasEscapedNewlines: rawKey.includes('\\n'),
+        keyHasRealNewlines: rawKey.includes('\n'),
+        email: process.env.GOOGLE_SERVICE_ACCOUNT_EMAIL ? (process.env.GOOGLE_SERVICE_ACCOUNT_EMAIL.substring(0, 10) + '...') : 'missing'
+    }
+
     try {
-        console.log('Manual Sync Triggered...')
-
-        const rawKey = process.env.GOOGLE_PRIVATE_KEY || '';
-        const debugInfo = {
-            hasEmail: !!process.env.GOOGLE_SERVICE_ACCOUNT_EMAIL,
-            hasKey: !!rawKey,
-            keyLength: rawKey.length,
-            keyStartsWithHeader: rawKey.includes('-----BEGIN PRIVATE KEY-----'),
-            keyHasEscapedNewlines: rawKey.includes('\\n'),
-            keyHasRealNewlines: rawKey.includes('\n'),
-            email: process.env.GOOGLE_SERVICE_ACCOUNT_EMAIL ? (process.env.GOOGLE_SERVICE_ACCOUNT_EMAIL.substring(0, 10) + '...') : 'missing'
-        }
-        console.log('Env Debug Info:', debugInfo)
-
+        console.log('Manual Sync Triggered...', debugInfo)
         const results = await runImport()
         return NextResponse.json({
             success: true,
@@ -32,7 +31,8 @@ export async function GET() {
             success: false,
             error: error.message,
             stack: error.stack,
-            hint: 'EPERM o DECODER suelen ser error de formato en la GOOGLE_PRIVATE_KEY'
+            debug: debugInfo,
+            hint: 'EPERM o DECODER suelen ser error de formato en la GOOGLE_PRIVATE_KEY. Asegúrate de que pegaste la llave completa, sin comillas, y que las cabeceras BEGIN/END están presentes.'
         }, { status: 500 })
     }
 }
