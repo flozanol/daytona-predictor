@@ -6,7 +6,18 @@ import { calcularPronosticoDaytona } from '@/lib/forecast'
 export const dynamic = 'force-dynamic'
 
 async function getSalesData() {
-    // Fetch labels removed - Mapping complete
+    const { data: marchData } = await supabase
+        .from('registros_agencias')
+        .select('*')
+        .gte('fecha', '2026-03-01')
+        .lte('fecha', '2026-03-31')
+
+    const { data: februaryData } = await supabase
+        .from('registros_agencias')
+        .select('*')
+        .gte('fecha', '2026-02-01')
+        .lte('fecha', '2026-02-28')
+
     return { marchData, februaryData }
 }
 
