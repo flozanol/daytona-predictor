@@ -6,10 +6,6 @@ import { calcularPronosticoDaytona } from '@/lib/forecast'
 export const dynamic = 'force-dynamic'
 
 async function getSalesData() {
-    const supabase = createClient(process.env.SUPABASE_URL, process.env.SUPABASE_KEY, {
-        db: { schema: 'grupo_daytona' }
-    })
-
     // Fetch labels for debugging funnels
     let labels = [];
     try {
