@@ -42,8 +42,13 @@ export default function DashboardClient({ initialStats, agencias, diaCorte }) {
             visitas: filteredStats.reduce((acc, s) => acc + s.funnel.showroom.visitas, 0),
             pruebas: filteredStats.reduce((acc, s) => acc + s.funnel.showroom.pruebas, 0),
             financiera: filteredStats.reduce((acc, s) => acc + s.funnel.showroom.financiera, 0),
+            aprobados: filteredStats.reduce((acc, s) => acc + s.funnel.showroom.aprobados, 0),
             avaluos: filteredStats.reduce((acc, s) => acc + s.funnel.showroom.avaluos, 0),
             ventas: filteredStats.reduce((acc, s) => acc + s.funnel.showroom.ventas, 0)
+        },
+        predictors: {
+            apartados: filteredStats.reduce((acc, s) => acc + (s.apartados || 0), 0),
+            probables: filteredStats.reduce((acc, s) => acc + (s.probables || 0), 0),
         }
     }
 
@@ -77,9 +82,18 @@ export default function DashboardClient({ initialStats, agencias, diaCorte }) {
                 <KpiTile label="Unidades Nuevas" value={globalVentasNuevos} subtext="Ventas Reales" color="cyan" glow />
                 <KpiTile label="Unidades Seminuevos" value={globalVentasSemis} subtext="En crecimiento" color="amber" />
                 <KpiTile label="Pronóstico AI (Total)" value={globalPronostico} subtext="Proyección Fin de Mes" color="cyan" neon />
-                <div className="glass-card p-8 flex flex-col justify-center items-center text-center">
-                    <div className="w-16 h-16 rounded-full border-4 border-cyan-500/20 border-t-cyan-500 animate-spin mb-4" />
-                    <p className="text-[10px] font-black tracking-widest uppercase">Live Engine</p>
+                <div className="glass-card p-8 bg-gradient-to-br from-cyan-500/10 to-transparent border-cyan-500/20">
+                    <p className="text-slate-400 text-[10px] font-black tracking-[0.2em] uppercase mb-4">Potencial de Cierre</p>
+                    <div className="flex justify-between items-end">
+                        <div>
+                            <h2 className="text-4xl font-black mb-1">{globalFunnel.predictors.probables || 0}</h2>
+                            <p className="text-cyan-400/60 text-[10px] font-medium uppercase">Probables 48h</p>
+                        </div>
+                        <div className="text-right">
+                            <h2 className="text-4xl font-black mb-1 text-white">{globalFunnel.predictors.apartados || 0}</h2>
+                            <p className="text-slate-500 text-[10px] font-medium uppercase">Apartados</p>
+                        </div>
+                    </div>
                 </div>
             </section>
 
@@ -151,6 +165,7 @@ export default function DashboardClient({ initialStats, agencias, diaCorte }) {
                         { label: 'Visitas', value: globalFunnel.showroom.visitas },
                         { label: 'Pruebas', value: globalFunnel.showroom.pruebas },
                         { label: 'Financiera', value: globalFunnel.showroom.financiera },
+                        { label: 'Aprobados', value: globalFunnel.showroom.aprobados },
                         { label: 'Avalúos', value: globalFunnel.showroom.avaluos },
                         { label: 'Ventas', value: globalFunnel.showroom.ventas }
                     ]}

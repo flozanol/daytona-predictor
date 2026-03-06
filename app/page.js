@@ -40,16 +40,20 @@ export default async function Dashboard() {
         const ventasNuevosHoy = marchAgencia.reduce((acc, r) => acc + (r.ventas_nuevos || 0), 0)
         const ventasSemisHoy = marchAgencia.reduce((acc, r) => acc + (r.ventas_seminuevos || 0), 0)
 
-        // Métricas de Funnel
-        const leads = marchAgencia.reduce((acc, r) => acc + (r.leads || 0), 0)
+        // Métricas de "Bodega" v2
+        const leads = marchAgencia.reduce((acc, r) => acc + (r.leads_recibidos || 0), 0)
         const contactados = marchAgencia.reduce((acc, r) => acc + (r.leads_contactados || 0), 0)
         const citasAgendadas = marchAgencia.reduce((acc, r) => acc + (r.citas_agendadas || 0), 0)
         const citasEfectivas = marchAgencia.reduce((acc, r) => acc + (r.citas_efectivas || 0), 0)
 
-        const visitas = marchAgencia.reduce((acc, r) => acc + (r.visitas_piso || 0), 0)
-        const pruebas = marchAgencia.reduce((acc, r) => acc + (r.pruebas_manejo || 0), 0)
+        const visitas = marchAgencia.reduce((acc, r) => acc + (r.total_visitas_piso || 0), 0)
+        const pruebas = marchAgencia.reduce((acc, r) => acc + (r.pruebas_manejo_total || 0), 0)
         const financiera = marchAgencia.reduce((acc, r) => acc + (r.solicitudes_financiera || 0), 0)
-        const avaluos = marchAgencia.reduce((acc, r) => acc + (r.avaluos || 0), 0)
+        const aprobados = marchAgencia.reduce((acc, r) => acc + (r.aprobados_financiera || 0), 0)
+        const avaluos = marchAgencia.reduce((acc, r) => acc + (r.avaluos_total || 0), 0)
+
+        const probables = marchAgencia.reduce((acc, r) => acc + (r.ventas_probables_48_hrs || 0), 0)
+        const apartados = marchAgencia.reduce((acc, r) => acc + (r.apartados_dia || 0), 0)
 
         const pronosticoNuevos = calcularPronosticoDaytona(ventasNuevosHoy, diaCorte, agencia)
         const pronosticoSemis = calcularPronosticoDaytona(ventasSemisHoy, diaCorte, agencia)
@@ -64,9 +68,11 @@ export default async function Dashboard() {
             pronosticoSemis,
             pronosticoTotal: pronosticoNuevos + pronosticoSemis,
             tendenciaPositiva: (pronosticoNuevos + pronosticoSemis) > cierreFebTotal,
+            probables,
+            apartados,
             funnel: {
                 digital: { leads, contactados, citasAgendadas, citasEfectivas, ventas: ventasNuevosHoy },
-                showroom: { visitas, pruebas, financiera, avaluos, ventas: ventasNuevosHoy }
+                showroom: { visitas, pruebas, financiera, aprobados, avaluos, ventas: ventasNuevosHoy }
             }
         }
     })
