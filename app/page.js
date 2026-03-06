@@ -22,11 +22,16 @@ async function getSalesData() {
 export default async function Dashboard() {
     const { marchData, februaryData } = await getSalesData()
 
-    const agencias = ['Acura', 'GWM Cuernavaca', 'Infiniti', 'Mazda Vallejo', 'Mazda Zapata', 'Kia', 'Hyundai', 'Suzuki', 'Used Cars']
+    // Extraer lista única de agencias que tienen registros en Marzo o Febrero
+    const allAgencies = [
+        ...(marchData?.map(r => r.agencia) || []),
+        ...(februaryData?.map(r => r.agencia) || [])
+    ]
+    const agencias = [...new Set(allAgencies)].sort()
 
-    const today = 6
+    const today = 6 // Corte al 6 de marzo
     const daysInMonth = 31
-    const factorCierre = 1.2
+    const factorCierreIA = 1.15 // 15% extra por ser la última semana más fuerte
 
     const stats = agencias.map(agencia => {
         const marchAgencia = marchData?.filter(r => r.agencia === agencia) || []
@@ -35,8 +40,8 @@ export default async function Dashboard() {
         const actuales = marchAgencia.reduce((acc, r) => acc + (r.ventas_nuevos || 0) + (r.ventas_seminuevos || 0), 0)
         const cierreFeb = febAgencia.reduce((acc, r) => acc + (r.ventas_nuevos || 0) + (r.ventas_seminuevos || 0), 0)
 
-        // Pronóstico = (Actuales / hoy) * total_dias * factor
-        const pronostico = actuales > 0 ? (actuales / today) * daysInMonth * factorCierre : 0
+        // Pronóstico IA = (Actuales / hoy) * días_mes * 1.15
+        const pronostico = actuales > 0 ? (actuales / today) * daysInMonth * factorCierreIA : 0
         const sube = pronostico > cierreFeb
 
         return {
