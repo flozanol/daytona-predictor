@@ -7,13 +7,15 @@ export async function GET() {
     try {
         console.log('Manual Sync Triggered...')
 
-        // Debug check for critical vars
+        const rawKey = process.env.GOOGLE_PRIVATE_KEY || '';
         const debugInfo = {
             hasEmail: !!process.env.GOOGLE_SERVICE_ACCOUNT_EMAIL,
-            email: process.env.GOOGLE_SERVICE_ACCOUNT_EMAIL ? (process.env.GOOGLE_SERVICE_ACCOUNT_EMAIL.substring(0, 5) + '...') : 'missing',
-            hasKey: !!process.env.GOOGLE_PRIVATE_KEY,
-            keyStart: process.env.GOOGLE_PRIVATE_KEY ? process.env.GOOGLE_PRIVATE_KEY.substring(0, 30) : 'missing',
-            hasSheetId: !!process.env.SPREADSHEET_ID
+            hasKey: !!rawKey,
+            keyLength: rawKey.length,
+            keyStartsWithHeader: rawKey.includes('-----BEGIN PRIVATE KEY-----'),
+            keyHasEscapedNewlines: rawKey.includes('\\n'),
+            keyHasRealNewlines: rawKey.includes('\n'),
+            email: process.env.GOOGLE_SERVICE_ACCOUNT_EMAIL ? (process.env.GOOGLE_SERVICE_ACCOUNT_EMAIL.substring(0, 10) + '...') : 'missing'
         }
         console.log('Env Debug Info:', debugInfo)
 
