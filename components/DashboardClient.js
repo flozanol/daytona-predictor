@@ -52,187 +52,141 @@ export default function DashboardClient({ initialStats, agencias, diaCorte }) {
         }
     }
 
+    // Cálculos Globales para la Tríada Superior
+    const totalVentasGrupo = globalVentasNuevos + globalVentasSemis
+    const totalPronostico = globalPronostico
+    // Asumimos un objetivo global (ej: Feb + 10%) para el cumplimiento
+    const globalObjetivo = 350 // Fallback estimado si no hay datos históricos suficientes
+    const cumplimientoGlobal = Math.round((totalPronostico / globalObjetivo) * 100)
+
     return (
-        <main className="min-h-screen premium-bg text-slate-100 p-4 md:p-12 relative overflow-hidden">
+        <main className="min-h-screen bg-slate-950 text-slate-100 p-4 md:p-12 relative overflow-hidden selection:bg-cyan-500/30">
             <div className="animated-bg" />
 
-            {/* BARRA CORPORATIVA SUPERIOR */}
-            <div className="relative z-20 mb-12 flex flex-col md:flex-row justify-between items-center bg-white/[0.03] border border-white/10 p-6 rounded-[2rem] backdrop-blur-3xl shadow-2xl">
-                <div className="flex flex-col mb-4 md:mb-0">
-                    <h2 className="text-sm font-black tracking-[0.3em] uppercase opacity-40">Grupo Daytona • Predictor IA</h2>
-                    <p className="text-2xl font-black text-white">CONSOLIDADO MARZO 6</p>
-                </div>
-                <div className="flex gap-12 text-center">
-                    <div>
-                        <p className="text-[10px] uppercase tracking-widest opacity-50 font-bold mb-1">Cierre Proyectado</p>
-                        <p className="text-3xl font-black neon-text-cyan">{globalPronostico}</p>
+            {/* HEADER EJECUTIVO CORPORATIVO */}
+            <header className="relative z-20 mb-16 flex flex-col md:flex-row justify-between items-end gap-8">
+                <div className="flex flex-col">
+                    <div className="flex items-center gap-3 mb-4">
+                        <div className="w-12 h-1 bg-cyan-500 shadow-[0_0_15px_rgba(34,211,238,0.8)]" />
+                        <span className="text-xs font-black tracking-[0.5em] uppercase text-cyan-500/80">Daytona Core • Predictive AI</span>
                     </div>
-                    <div className="hidden md:block">
-                        <p className="text-[10px] uppercase tracking-widest opacity-50 font-bold mb-1">Reales (N+S)</p>
-                        <p className="text-3xl font-black text-white">{globalVentasNuevos + globalVentasSemis}</p>
-                    </div>
-                    <div className="hidden md:block">
-                        <p className="text-[10px] uppercase tracking-widest opacity-50 font-bold mb-1">Apartados</p>
-                        <p className="text-3xl font-black text-emerald-400">{globalFunnel.predictors.apartados}</p>
-                    </div>
-                </div>
-                <DashboardFilters
-                    agencias={agencias}
-                    currentFilter={filter}
-                    onFilterChange={setFilter}
-                />
-            </div>
-
-            <header className="relative z-10 mb-16 flex flex-col md:flex-row justify-between items-start md:items-center gap-8">
-                <div>
-                    <h1 className="text-6xl md:text-8xl font-black tracking-tighter neon-text-cyan mb-4">
-                        DAYTONA<span className="text-white/20">.</span>CORE
+                    <h1 className="text-5xl md:text-7xl font-black tracking-tighter text-white">
+                        GRUPO <span className="text-white/20">DAYTONA</span>
                     </h1>
-                    <span className="px-3 py-1 bg-cyan-500/10 border border-cyan-500/20 rounded-full text-[10px] font-bold tracking-widest text-cyan-400 uppercase">
-                        Intelligence v2.2 Luxury
-                    </span>
+                    <p className="text-slate-500 font-medium tracking-widest uppercase text-[10px] mt-2">Dashboard Ejecutivo • Marzo 2026 • Día {diaCorte}</p>
+                </div>
+
+                <div className="flex items-center gap-6">
+                    <DashboardFilters
+                        agencias={agencias}
+                        currentFilter={filter}
+                        onFilterChange={setFilter}
+                    />
                 </div>
             </header>
 
-            {/* GRID DE AGENCIAS (LUJO) */}
+            {/* TRÍADA DE KPIs GIGANTES */}
             <section className="relative z-10 grid grid-cols-1 md:grid-cols-3 gap-8 mb-20">
-                {filteredStats.map(s => (
-                    <div key={s.agencia} className="glass-card p-10 flex flex-col justify-between card-hover-effect border-t-2 border-t-cyan-500/20">
-                        <div>
-                            <div className="flex justify-between items-start mb-10">
-                                <div>
-                                    <h3 className="text-2xl font-black tracking-tighter mb-1 uppercase italic">{s.agencia}</h3>
-                                    <div className="flex gap-2 text-[10px] font-mono text-slate-500 uppercase tracking-widest">
-                                        <span>REALE: <b className="text-white">{s.ventasNuevosHoy + s.ventasSemisHoy}</b></span>
-                                    </div>
-                                </div>
-                                <div className={`w-3 h-3 rounded-full ${s.tendenciaPositiva ? 'bg-cyan-500 shadow-[0_0_15px_rgba(34,211,238,0.7)]' : 'bg-amber-500 animate-pulse shadow-[0_0_10px_rgba(251,191,36,0.5)]'}`} />
-                            </div>
-
-                            {/* INDICADORES DE SALUD (FUNNEL) */}
-                            <div className="bg-white/[0.02] border border-white/5 rounded-2xl p-4 mb-8 flex justify-around items-center">
-                                <div className="text-center">
-                                    <p className="text-[9px] text-slate-500 uppercase font-black mb-1">🌐 Leads</p>
-                                    <p className="text-lg font-black text-cyan-400">{s.leads || 0}</p>
-                                </div>
-                                <div className="w-px h-8 bg-white/10" />
-                                <div className="text-center">
-                                    <p className="text-[9px] text-slate-500 uppercase font-black mb-1">📅 Citas</p>
-                                    <p className="text-lg font-black text-white">{s.funnel.digital.citasEfectivas || 0}</p>
-                                </div>
-                                <div className="w-px h-8 bg-white/10" />
-                                <div className="text-center">
-                                    <p className="text-[9px] text-slate-500 uppercase font-black mb-1">💎 Apart.</p>
-                                    <p className="text-lg font-black text-emerald-400">{s.apartados || 0}</p>
-                                </div>
-                            </div>
-                        </div>
-
-                        <div>
-                            {/* TERMÓMETRO DE CIERRE */}
-                            <div className="flex flex-col items-end">
-                                <p className="text-[10px] font-black tracking-[0.2em] text-slate-500 uppercase mb-2">Termómetro de Cierre</p>
-                                <span className="thermometer-text">
-                                    {s.pronostico20}
-                                </span>
-                                <p className="text-[10px] font-bold text-cyan-400/50 uppercase">Unidades Proyectadas</p>
-                            </div>
-
-                            <div className="mt-8 pt-6 border-t border-white/5 flex justify-between items-center opacity-40 group-hover:opacity-100 transition-opacity">
-                                <span className="text-[9px] font-mono">P: {s.probables}</span>
-                                <span className="text-[9px] font-mono">S: {s.pronosticoSemis}</span>
-                                <span className="text-[9px] font-mono">IA: V2.2</span>
-                            </div>
-                        </div>
-                    </div>
-                ))}
+                <ExecutiveKpi
+                    label="Ventas Reales Grupo"
+                    value={totalVentasGrupo}
+                    subtext="Unidades (Nuevos + Semis)"
+                    icon="📊"
+                />
+                <ExecutiveKpi
+                    label="Pronóstico Total Marzo"
+                    value={totalPronostico}
+                    subtext="Proyección Predictiva IA"
+                    color="cyan"
+                    glow
+                />
+                <ExecutiveKpi
+                    label="Cumplimiento Global"
+                    value={`${cumplimientoGlobal}%`}
+                    subtext="vs Objetivo Corporativo"
+                    icon="🎯"
+                />
             </section>
 
-            <section className="relative z-10 grid grid-cols-1 md:grid-cols-2 gap-8 pb-32">
-                <FunnelWidget
-                    title="Digital Funnel"
-                    icon="🌐"
-                    color="cyan"
-                    data={[
-                        { label: 'Leads', value: globalFunnel.digital.leads },
-                        { label: 'Contactados', value: globalFunnel.digital.contactados },
-                        { label: 'Citas', value: globalFunnel.digital.citas },
-                        { label: 'Efectivas', value: globalFunnel.digital.efectivas },
-                        { label: 'Ventas', value: globalFunnel.digital.ventas }
-                    ]}
-                />
+            {/* GRID DE AGENCIAS EJECUTIVAS */}
+            <section className="relative z-10 grid grid-cols-1 md:grid-cols-3 gap-8 pb-32">
+                {filteredStats.map(s => {
+                    // Lógica de Ritmo/Salud (Status)
+                    // Objetivo dinámico basado en febrero o promedio
+                    const objetivoAgencia = 30 // Fallback
+                    const ritmoNecesario = (diaCorte / 31) * objetivoAgencia
+                    const ventasAgencia = s.ventasNuevosHoy + s.ventasSemisHoy
+                    const isHealthy = ventasAgencia >= (ritmoNecesario * 0.8)
+                    const statusClass = isHealthy ? 'border-emerald-500/30' : 'border-rose-500/30'
+                    const statusText = isHealthy ? 'En Ritmo' : 'Bajo Meta'
+                    const statusColor = isHealthy ? 'text-emerald-400' : 'text-rose-400'
 
-                <FunnelWidget
-                    title="Showroom Funnel"
-                    icon="🚗"
-                    color="amber"
-                    data={[
-                        { label: 'Visitas', value: globalFunnel.showroom.visitas },
-                        { label: 'Pruebas', value: globalFunnel.showroom.pruebas },
-                        { label: 'Financiera', value: globalFunnel.showroom.financiera },
-                        { label: 'Aprobados', value: globalFunnel.showroom.aprobados },
-                        { label: 'Avalúos', value: globalFunnel.showroom.avaluos },
-                        { label: 'Ventas', value: globalFunnel.showroom.ventas }
-                    ]}
-                />
+                    return (
+                        <div key={s.agencia} className={`executive-glass-card border-l-4 ${statusClass} flex flex-col justify-between group`}>
+                            <div>
+                                <div className="flex justify-between items-start mb-8">
+                                    <div>
+                                        <h3 className="text-2xl font-black tracking-tighter text-white uppercase group-hover:text-cyan-400 transition-colors uppercase">{s.agencia}</h3>
+                                        <p className={`text-[10px] font-bold uppercase tracking-widest ${statusColor} mt-1`}>{statusText}</p>
+                                    </div>
+                                    <div className="text-right">
+                                        <p className="text-[10px] text-slate-500 font-bold uppercase tracking-widest mb-1">Reales</p>
+                                        <p className="text-xl font-black">{ventasAgencia}</p>
+                                    </div>
+                                </div>
+
+                                {/* FUNNEL CHIPS */}
+                                <div className="flex flex-wrap gap-2 mb-10">
+                                    <FunnelChip icon="🌐" label="Leads" value={s.leads || 0} />
+                                    <FunnelChip icon="📅" label="Citas" value={s.funnel.digital.citasEfectivas || 0} />
+                                    <FunnelChip icon="💎" label="Apartados" value={s.apartados || 0} />
+                                    <FunnelChip icon="🚗" label="Ventas" value={ventasAgencia} />
+                                </div>
+                            </div>
+
+                            <div className="flex flex-col items-end">
+                                <p className="text-[11px] font-black tracking-[0.3em] text-slate-500 uppercase mb-2">Reloj de Cierre</p>
+                                <div className="relative">
+                                    <span className="closing-clock neon-glow-cyan">
+                                        {s.pronostico20}
+                                    </span>
+                                    {/* Sutil indicador de progreso interno si quisiéramos */}
+                                </div>
+                                <div className="flex gap-4 mt-4 text-[9px] font-mono text-slate-600 uppercase tracking-tighter">
+                                    <span>Probables: {s.probables}</span>
+                                    <span>Semis: {s.pronosticoSemis}</span>
+                                </div>
+                            </div>
+                        </div>
+                    )
+                })}
             </section>
         </main>
     )
 }
 
-function KpiTile({ label, value, subtext, color, glow, neon }) {
-    const textClass = color === 'cyan' ? (neon ? 'neon-text-cyan' : 'text-white') : 'text-white';
-    const subtextClass = color === 'cyan' ? 'text-cyan-400/60' : 'text-amber-400/60';
-    const glowClass = glow ? 'glow-cyan' : '';
+function ExecutiveKpi({ label, value, subtext, icon, color, glow }) {
+    const valueClass = color === 'cyan' ? 'text-cyan-400 neon-glow-cyan' : 'text-white'
+    const glowClass = glow ? 'shadow-[0_0_50px_-20px_rgba(34,211,238,0.3)]' : ''
 
     return (
-        <div className={`glass-card p-8 ${glowClass} ${color === 'cyan' && !glow && !neon ? 'border-cyan-500/30' : ''} ${color === 'amber' ? 'bg-white/[0.05]' : ''}`}>
-            <p className="text-slate-400 text-[10px] font-black tracking-[0.2em] uppercase mb-4">{label}</p>
-            <h2 className={`text-5xl font-black mb-1 ${textClass}`}>{value.toLocaleString()}</h2>
-            <p className={`${subtextClass} text-xs font-medium italic`}>{subtext}</p>
+        <div className={`executive-glass-card ${glowClass} border-t border-white/5`}>
+            <div className="flex justify-between items-start mb-6">
+                <p className="text-slate-500 text-[11px] font-black tracking-[0.2em] uppercase">{label}</p>
+                {icon && <span className="text-xl opacity-50">{icon}</span>}
+            </div>
+            <h2 className={`text-6xl font-black mb-2 tracking-tighter ${valueClass}`}>{value}</h2>
+            <p className="text-slate-400 text-xs font-medium italic opacity-60">{subtext}</p>
         </div>
     )
 }
 
-function FunnelWidget({ title, icon, color, data }) {
-    const colorClass = color === 'cyan' ? 'bg-cyan-500' : 'bg-amber-500';
-    const textClass = color === 'cyan' ? 'text-cyan-400' : 'text-amber-400';
-    const borderClass = color === 'cyan' ? 'border-cyan-500/10' : 'border-amber-500/10';
-
+function FunnelChip({ icon, label, value }) {
     return (
-        <div className={`glass-card p-10 border ${borderClass}`}>
-            <h3 className="text-2xl font-black mb-8 flex items-center gap-2">
-                <span className={`w-8 h-8 rounded-lg ${colorClass}/20 flex items-center justify-center ${textClass} text-sm`}>{icon}</span>
-                {title}
-            </h3>
-            <div className="space-y-6">
-                {data.map((step, i) => {
-                    const prevValue = data[i - 1]?.value || step.value;
-                    const conversion = i === 0 ? 100 : (prevValue > 0 ? (step.value / prevValue) * 100 : 0);
-
-                    return (
-                        <div key={step.label} className="relative">
-                            <div className="flex justify-between mb-2 px-1 items-end">
-                                <div className="flex flex-col">
-                                    <span className="text-[10px] font-black uppercase tracking-widest text-slate-500">{step.label}</span>
-                                    <span className="text-2xl font-black">{step.value.toLocaleString()}</span>
-                                </div>
-                                {i > 0 && (
-                                    <span className={`text-[10px] font-bold px-2 py-0.5 rounded ${colorClass}/10 ${textClass}`}>
-                                        {conversion.toFixed(1)}% conv.
-                                    </span>
-                                )}
-                            </div>
-                            <div className="h-2 w-full bg-white/5 rounded-full overflow-hidden">
-                                <div
-                                    className={`h-full ${colorClass} transition-all duration-1000 shadow-[0_0_15px_rgba(34,211,238,0.5)]`}
-                                    style={{ width: `${data[0].value > 0 ? Math.max(5, (step.value / data[0].value) * 100) : 5}%` }}
-                                />
-                            </div>
-                        </div>
-                    );
-                })}
-            </div>
+        <div className="flex items-center gap-2 bg-white/[0.03] border border-white/5 px-3 py-1.5 rounded-full">
+            <span className="text-xs">{icon}</span>
+            <span className="text-[10px] font-black text-slate-400 uppercase tracking-tighter">{label}:</span>
+            <span className="text-[11px] font-bold text-white">{value}</span>
         </div>
-    );
+    )
 }
