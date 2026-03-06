@@ -24,11 +24,12 @@ async function getSalesData() {
 export default async function Dashboard() {
     const { marchData, februaryData } = await getSalesData()
 
-    const allAgencies = [
-        ...(marchData?.map(r => r.agencia) || []),
-        ...(februaryData?.map(r => r.agencia) || [])
+    const agencias = [
+        'Acura', 'GWM Cuernavaca', 'GWM Iztapalapa',
+        'Honda Cuajimalpa', 'Honda Interlomas',
+        'KIA Interlomas', 'KIA Iztapalapa',
+        'MG Cuajimalpa', 'MG Interlomas', 'MG Iztapalapa', 'MG Santa Fe'
     ]
-    const agencias = [...new Set(allAgencies)].sort()
 
     const diaCorte = 6 // Corte al 6 de marzo
 
