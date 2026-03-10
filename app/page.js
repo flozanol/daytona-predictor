@@ -19,7 +19,7 @@ async function getSalesData() {
     return { marchData, februaryData }
 }
 
-import DashboardClient from '@/components/DashboardClient'
+import PredictorDashboard from '@/components/PredictorDashboard'
 
 export default async function Dashboard() {
     const { marchData, februaryData } = await getSalesData()
@@ -90,30 +90,10 @@ export default async function Dashboard() {
     const globalFebSemis = stats.reduce((acc, s) => acc + s.febSemis, 0)
     const globalPronostico = stats.reduce((acc, s) => acc + s.pronosticoTotal, 0)
 
-    // Totales de Funnel Global
-    const globalFunnel = {
-        digital: {
-            leads: stats.reduce((acc, s) => acc + s.funnel.digital.leads, 0),
-            contactados: stats.reduce((acc, s) => acc + s.funnel.digital.contactados, 0),
-            citas: stats.reduce((acc, s) => acc + s.funnel.digital.citasAgendadas, 0),
-            efectivas: stats.reduce((acc, s) => acc + s.funnel.digital.citasEfectivas, 0),
-            ventas: stats.reduce((acc, s) => acc + s.funnel.digital.ventas, 0)
-        },
-        showroom: {
-            visitas: stats.reduce((acc, s) => acc + s.funnel.showroom.visitas, 0),
-            pruebas: stats.reduce((acc, s) => acc + s.funnel.showroom.pruebas, 0),
-            financiera: stats.reduce((acc, s) => acc + s.funnel.showroom.financiera, 0),
-            aprobados: stats.reduce((acc, s) => acc + s.funnel.showroom.aprobados, 0), // Added aprobados here too
-            avaluos: stats.reduce((acc, s) => acc + s.funnel.showroom.avaluos, 0),
-            ventas: stats.reduce((acc, s) => acc + s.funnel.showroom.ventas, 0)
-        }
-    }
-
     return (
-        <DashboardClient
+        <PredictorDashboard
             initialStats={stats}
             agencias={agencias}
-            diaCorte={diaCorte}
             globalFebBaselines={{ nuevos: globalFebNuevos, semis: globalFebSemis }}
         />
     )
